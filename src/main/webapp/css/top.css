@@ -1,0 +1,46 @@
+* {
+    margin: 0px;
+    padding: 0px;
+    font-size: 15px;
+}
+
+#con {
+    height: 47px;
+    background: url("../img/leftbg1.jpg") no-repeat center;
+    background-size:100%;
+}
+
+#con div {
+    float: left;
+}
+
+#left {
+    height: 37px;
+    width: 27%;
+    margin-top: 0px;
+    margin-left: 3%;
+    font-size: 35px;
+    font-weight: bold;
+    color: grey;
+}
+
+#mid {
+    text-align: right;
+    width: 69%;
+    color: #665856;
+}
+
+#mid a:VISITED, #mid a:LINK {
+    color: #665856;
+    font-family: arial;
+    text-decoration: none;
+}
+
+#mid a:HOVER {
+    color: #665856;
+    font-family: arial;
+    text-decoration: underline;
+}
+#mid span{
+    text-align: right;
+}

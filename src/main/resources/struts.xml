@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.3//EN"
+        "http://struts.apache.org/dtds/struts-2.3.dtd">
+
+<struts>
+    <constant name="struts.objectFactory" value="spring"/>
+    <package name="default" namespace="/" extends="struts-default" strict-method-invocation="false">
+        <!--<global-exception-mappings>-->
+            <!--<exception-mapping exception="UserException" result="error"></exception-mapping>-->
+        <!--</global-exception-mappings>-->
+
+
+        <!-- 基于通配符解决方案 -->
+        <!-- 约定大于配置 -->
+        <!-- 整合了Spring以后,action对象就是从Spring IOC容器中获取 -->
+        <action name="*_*" class="{1}Action" method="{2}">
+            <result>/WEB-INF/jsp/{1}/{2}.jsp</result>
+            <result name="redirect" type="redirect">/{1}_list.action</result>
+            <result name="error">WEB-INF/jsp/error.jsp</result>
+            <result name="show">WEB-INF/jsp/{1}/show.jsp</result>
+            
+        </action>
+        <!-- 登录 -->
+        <action name="login" class="loginAction" method="login">
+            <result>/WEB-INF/jsp/main.jsp</result>
+            <result name="error">WEB-INF/jsp/error.jsp</result>
+        </action>
+        <!-- 顶部页面跳转 -->
+        <action name="top" class="loginAction" method="top">
+            <result>/WEB-INF/jsp/top.jsp</result>
+        </action>
+        <!-- 左部页面跳转 -->
+        <action name="left" class="loginAction" method="left">
+            <result name="left1">/WEB-INF/jsp/left1.jsp</result>
+            <result name="left2">/WEB-INF/jsp/left2.jsp</result>
+            <result name="left3">/WEB-INF/jsp/left3.jsp</result>
+        </action>
+        <!-- 主页面跳转 -->
+        <action name="welcome" class="loginAction" method="welcome">
+            <result>/WEB-INF/jsp/welcome.jsp</result>
+        </action>
+        <!-- 退出系统跳转 -->
+        <action name="logout" class="loginAction" method="logout">
+            <result>/login.jsp</result>
+        </action>
+        
+    </package>
+
+</struts>

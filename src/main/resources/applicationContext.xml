@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/tx
+       http://www.springframework.org/schema/tx/spring-tx.xsd
+       http://www.springframework.org/schema/aop
+       http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <!-- 打开基于注解的配置 -->
+    <context:annotation-config/>
+    <!-- 到哪些包下扫描注解 -->
+    <context:component-scan base-package="selectCourse.jz2"/>
+
+    <!-- 引入数据库文件 -->
+    <context:property-placeholder location="classpath:db.properties"/>
+
+    <!-- Spring用来控制用来所有业务逻辑，事务控制，数据源(druid或c3p0)，aop等 -->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <property name="driverClass" value="${jdbc.driver}"/>
+        <property name="jdbcUrl" value="${jdbc.url}"/>
+        <property name="user" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+        <property name="initialPoolSize" value="${jdbc.initPoolSize}"/>
+        <property name="maxPoolSize" value="${jdbc.maxPoolSize}"/>
+    </bean>
+
+    <!-- 配置sessionFactory -->
+    <bean id="sessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <!-- 配置hibernate属性 -->
+        <property name="hibernateProperties">
+            <props>
+                <!-- 数据库方言 -->
+                <prop key="hibernate.dialect">org.hibernate.dialect.MySQL5Dialect</prop>
+                <!-- 显示sql语句 -->
+                <prop key="hibernate.show_sql">true</prop>
+                <prop key="hibernate.format_sql">true</prop>
+                <!-- 数据表生成策略 -->
+                <prop key="hibernate.hbm2ddl.auto">update</prop>
+            </props>
+        </property>
+        <!-- 扫描并加载注解过的实体类 -->
+        <property name="packagesToScan" value="selectCourse.jz2.pojo"/>
+        <!-- 指定hbm文件的位置 -->
+        <!--<property name="mappingLocations" value="classpath:hbmXML/*.xml"/>-->
+    </bean>
+
+    <!-- 配置spring的声明式事务 -->
+    <!-- 创建事务管理器 -->
+    <bean id="transactionManager"
+          class="org.springframework.orm.hibernate5.HibernateTransactionManager">
+        <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+
+    <!-- 配置事务属性 -->
+    <tx:advice id="txAdvice" transaction-manager="transactionManager">
+        <tx:attributes>
+            <!-- 以add、delete、update开头的操作加入事务,并指定事务的传播行为
+                 REQUIRED：支持当前事务，如果当前没有事务，就新建一个事务。这是最常见的选择。
+                 SUPPORTS：支持当前事务，如果当前没有事务，就以非事务方式执行。-->
+            <tx:method name="add*" propagation="REQUIRED"/>
+            <tx:method name="delete*" propagation="REQUIRED"/>
+            <tx:method name="update*" propagation="REQUIRED"/>
+            <!-- 其他方法不加事务,并且设置为只读 -->
+            <tx:method name="*" propagation="SUPPORTS" read-only="true"/>
+        </tx:attributes>
+    </tx:advice>
+
+    <!-- 配置事务管理 -->
+    <aop:config>
+        <!-- 定义切入点 -->
+        <aop:pointcut expression="execution(* selectCourse.jz2.service.impl.*.*(..))"
+                      id="txPointCut"/>
+        <aop:advisor advice-ref="txAdvice" pointcut-ref="txPointCut"/>
+    </aop:config>
+    <!-- 基于CGLIB的动态代理实现 -->
+    <aop:aspectj-autoproxy proxy-target-class="true"/>
+
+</beans>
